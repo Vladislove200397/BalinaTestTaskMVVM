@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B9361E0429EF9D4700ADC071 /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9361E0329EF9D4700ADC071 /* AlertManager.swift */; };
+		B9361E0629EFA5AB00ADC071 /* UIVIewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9361E0529EFA5AB00ADC071 /* UIVIewController+Extension.swift */; };
 		B9C3F53929EF28C20005D0FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C3F53829EF28C20005D0FD /* AppDelegate.swift */; };
 		B9C3F53B29EF28C20005D0FD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C3F53A29EF28C20005D0FD /* SceneDelegate.swift */; };
 		B9C3F54029EF28C20005D0FD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9C3F53E29EF28C20005D0FD /* Main.storyboard */; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		B9361E0329EF9D4700ADC071 /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
+		B9361E0529EFA5AB00ADC071 /* UIVIewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIVIewController+Extension.swift"; sourceTree = "<group>"; };
 		B9C3F53529EF28C20005D0FD /* BalinaTestTaskMVVM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BalinaTestTaskMVVM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C3F53829EF28C20005D0FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B9C3F53A29EF28C20005D0FD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				B9C3F56F29EF3B280005D0FD /* MVVMCell.swift */,
 				B9C3F55729EF2A2A0005D0FD /* UIImageView+Extension.swift */,
 				B9361E0329EF9D4700ADC071 /* AlertManager.swift */,
+				B9361E0529EFA5AB00ADC071 /* UIVIewController+Extension.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -244,6 +247,7 @@
 				B9C3F56629EF2E0D0005D0FD /* MainViewControllerViewModel.swift in Sources */,
 				B9C3F56829EF2E160005D0FD /* MainViewController.swift in Sources */,
 				B9C3F55F29EF2AA70005D0FD /* MVVMView.swift in Sources */,
+				B9361E0629EFA5AB00ADC071 /* UIVIewController+Extension.swift in Sources */,
 				B9C3F53929EF28C20005D0FD /* AppDelegate.swift in Sources */,
 				B9C3F53B29EF28C20005D0FD /* SceneDelegate.swift in Sources */,
 				B9C3F56B29EF2FAE0005D0FD /* DataCell.swift in Sources */,

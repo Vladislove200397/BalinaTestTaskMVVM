@@ -8,24 +8,29 @@
 import UIKit
 
 class MainViewControllerViewModel {
-    var dataModel: Dynamic<DataModel?> = Dynamic(nil)
+    private var searchService: GETDataManager?
+    private var postService: POSTDataManager?
     private var loadTask: Task<Void, Never>?
-    private lazy var searchService = GETDataManager()
-    private lazy var postService = POSTDataManager()
+    var dataModel: Dynamic<DataModel?> = Dynamic(nil)
+    var requestError: Dynamic<Error?> = Dynamic(nil)
+    var urlResponse: Dynamic<URLResponse?> = Dynamic(nil)
     var dataArray: [Content] = []
     var isLoading = false
     var page = 0
     var selectedIndexPath: Int = 0
-    var requestError: Dynamic<Error?> = Dynamic(nil)
-    var urlResponse: Dynamic<URLResponse?> = Dynamic(nil)
+    
+    init(searchService: GETDataManager, postService: POSTDataManager) {
+        self.searchService = searchService
+        self.postService = postService
+    }
     
     @MainActor
     func getPaginationRequest(page: Int) {
         loadTask?.cancel()
         loadTask = Task {
             do {
-                let paginationData = try await searchService.getData(requestType: .getDataPagination(page: "\(page)"))
-                paginationData.content.forEach { contents in
+                let paginationData = try await searchService?.getData(requestType: .getDataPagination(page: "\(page)"))
+                paginationData?.content.forEach { contents in
                     dataArray.append(contents)
                     dataModel.value = paginationData
                 }
@@ -40,7 +45,7 @@ class MainViewControllerViewModel {
         loadTask?.cancel()
         loadTask = Task {
             do {
-                let urlResponse = try await postService.uploadData(name, id, image, to: .postData)
+                let urlResponse = try await postService?.uploadData(name, id, image, to: .postData)
                 self.urlResponse.value = urlResponse
             } catch {
                 requestError.value = error

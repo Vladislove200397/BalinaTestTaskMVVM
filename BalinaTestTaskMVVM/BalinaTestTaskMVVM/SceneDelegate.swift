@@ -14,7 +14,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        let viewModel = MainViewControllerViewModel()
+        let searchService = GETDataManager()
+        let postService = POSTDataManager()
+        let viewModel = MainViewControllerViewModel(searchService: searchService, postService: postService)
         window = UIWindow(windowScene: windowScene)
         window?.windowScene = windowScene
         window?.rootViewController = UINavigationController(rootViewController: MainViewController(viewModel: viewModel)) 

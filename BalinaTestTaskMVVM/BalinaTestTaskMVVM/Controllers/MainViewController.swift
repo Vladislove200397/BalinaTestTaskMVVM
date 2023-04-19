@@ -11,7 +11,6 @@ class MainViewController: MVVMController {
     var contentView: MainViewControllerView {
         return view as! MainViewControllerView
     }
-    
     let viewModel: MainViewControllerViewModel
     
     init(viewModel: MainViewControllerViewModel) {
@@ -38,11 +37,11 @@ class MainViewController: MVVMController {
             self?.contentView.tableView.reloadData()
             self?.viewModel.isLoading = false
         }
-        viewModel.urlResponse.bind { response in
-            AlertManager.showAlert(on: self, title: "Succes", message: "POST data succeded")
+        viewModel.urlResponse.bind {[weak self] response in
+            self?.showAlert(title: "Succes", message: "POST data succeded")
         }
-        viewModel.requestError.bind { error in
-            AlertManager.showAlert(on: self, title: "Error", message: error?.localizedDescription ?? "")
+        viewModel.requestError.bind {[weak self] error in
+            self?.showAlert(title: "Error", message: error?.localizedDescription ?? "")
         }
     }
     
