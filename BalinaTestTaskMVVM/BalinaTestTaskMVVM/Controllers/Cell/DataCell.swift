@@ -20,6 +20,7 @@ class DataCell: MVVMTableViewCell {
         stack.axis = .vertical
         stack.distribution = .fillEqually
         stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.spacing = 5
         return stack
     }()
     
@@ -130,7 +131,7 @@ extension DataCell {
             dataImageView.heightAnchor.constraint(equalToConstant: 45),
             dataImageView.widthAnchor.constraint(equalToConstant: 50),
             dataImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 10),
-            dataImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
+            dataImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
         ])
     }
     
@@ -138,7 +139,7 @@ extension DataCell {
         NSLayoutConstraint.activate([
             labelStack.leadingAnchor.constraint(equalTo: dataImageView.trailingAnchor, constant: 16),
             labelStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: 16),
-            labelStack.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5)
+            labelStack.centerYAnchor.constraint(equalTo: containerView.centerYAnchor)
         ])
     }
     

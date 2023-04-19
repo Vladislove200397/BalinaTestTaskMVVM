@@ -12,6 +12,7 @@ final class MainViewControllerView: MVVMView {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(DataCell.self, forCellReuseIdentifier: String(describing: DataCell.self))
+        tableView.backgroundColor = .white
         return tableView
     }()
     

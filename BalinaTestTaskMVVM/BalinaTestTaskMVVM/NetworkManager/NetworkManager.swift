@@ -26,25 +26,50 @@ actor GETDataManager {
 }
 
 actor POSTDataManager {
-    func uploadData(_ data: Data, to requestType: APIManager) async throws -> URLResponse {
+    
+    func uploadData(_ name: String, _ id: Int, _ image: UIImage, to requestType: APIManager) async throws -> URLResponse {
+       
+        let boundary = UUID().uuidString
+       
         var request = URLRequest(url: APIManager.createURL(request: requestType).url!)
-        
         request.httpMethod = requestType.requestType.requestType
-
-        let (_, response) = try await URLSession.shared.upload(
-            for: request,
-            from: data
-        )
+        
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        let (_, response) = try await URLSession.shared.upload(for: request, from: createData(name, id, image, boundary))
         
         guard let response = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
         
         guard response.statusCode == 200 else {
+            print(response.statusCode)
             throw URLError(.badServerResponse)
         }
         
         return response
+    }
+    
+    func createData(_ name: String, _ id: Int, _ image: UIImage, _ boundary: String) -> Data {
+        let filename = "\(id).jpg"
+        var data = Data()
+        
+        data.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
+        data.append("Content-Disposition: form-data; name=\"name\"\r\n\r\n".data(using: .utf8)!)
+        data.append("\(name)".data(using: .utf8)!)
+        
+        data.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
+        data.append("Content-Disposition: form-data; name=\"typeId\"\r\n\r\n".data(using: .utf8)!)
+        data.append("\(id)".data(using: .utf8)!)
+        
+        data.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
+        data.append("Content-Disposition: form-data; name=\"photo\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+        data.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
+        data.append(image.jpegData(compressionQuality: 0.5)!)
+        
+        data.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        return data
     }
 }
 

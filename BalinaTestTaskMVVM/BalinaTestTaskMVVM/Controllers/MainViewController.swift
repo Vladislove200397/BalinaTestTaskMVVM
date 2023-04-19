@@ -36,6 +36,13 @@ class MainViewController: MVVMController {
     override func bindViewModel() {
         viewModel.dataModel.bind {[weak self] dataModel in
             self?.contentView.tableView.reloadData()
+            self?.viewModel.isLoading = false
+        }
+        viewModel.urlResponse.bind { response in
+            AlertManager.showAlert(on: self, title: "Succes", message: "POST data succeded")
+        }
+        viewModel.requestError.bind { error in
+            AlertManager.showAlert(on: self, title: "Error", message: error?.localizedDescription ?? "")
         }
     }
     
@@ -49,11 +56,15 @@ class MainViewController: MVVMController {
             viewModel.page += 1
             viewModel.isLoading = true
             viewModel.getPaginationRequest(page: viewModel.page)
-            viewModel.dataModel.bind { model in
-                self.contentView.tableView.reloadData()
-                self.viewModel.isLoading = false
-            }
         }
+    }
+    
+    private func callImagePicker() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .camera
+        imagePicker.allowsEditing = true
+        present(imagePicker, animated: true)
     }
 }
 
@@ -66,8 +77,7 @@ extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: DataCell.self), for: indexPath)
         
-        guard let dataModel = viewModel.dataModel.value?.content,
-              let pagesCount = viewModel.dataModel.value?.totalPages else { return cell }
+        guard let pagesCount = viewModel.dataModel.value?.totalPages else { return cell }
         
         (cell as? DataCell)?.set(dataModel: viewModel.dataArray[indexPath.row])
         
@@ -76,20 +86,27 @@ extension MainViewController: UITableViewDataSource {
                 fetchMoreData()
             }
         }
+        
         return cell
     }
 }
 
 extension MainViewController: UITableViewDelegate {
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        guard let dataCount = viewModel.dataModel.value?.content.count,
-//                let pagesCount = viewModel.dataModel.value?.totalPages else { return }
-//        let currentOffset = scrollView.contentOffset.y
-//        let maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height
-//        let deltaOffset = maximumOffset - currentOffset
-//
-//        if deltaOffset <= 0, dataCount <= pagesCount  {
-//            fetchMoreData()
-//        }
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.selectedIndexPath = indexPath.row
+        callImagePicker()
+    }
+}
+
+extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        dismiss(animated: true)
+        
+        guard let image = info[.originalImage] as? UIImage else { return }
+        let name = "Кулаковский Владислав Александрович"
+        let id = viewModel.dataArray[viewModel.selectedIndexPath].id
+        
+        viewModel.postData(name: name, id: id, image: image)
+        
+    }
 }
