@@ -7,11 +7,35 @@
 
 import UIKit
 
-final class NetworkManager<T: Decodable> {
-    
-    func sendRequest(requestType: APIManager) async throws -> T {
-        let request = URLRequest(url: APIManager.createURL(request: requestType).url!)
-        let (data, response) = try await URLSession.shared.data(for: request)
+actor GETDataManager {
+
+    func getData(requestType: APIManager) async throws -> DataModel  {
+
+        let urlRequest = URLRequest(url: APIManager.createURL(request: requestType).url!)
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        guard let succesData = try? JSONDecoder().decode(DataModel.self, from: data) else { throw URLError(.cannotDecodeContentData)
+        }
+
+        return succesData
+    }
+}
+
+actor POSTDataManager {
+    func uploadData(_ data: Data, to requestType: APIManager) async throws -> URLResponse {
+        var request = URLRequest(url: APIManager.createURL(request: requestType).url!)
+        
+        request.httpMethod = requestType.requestType.requestType
+
+        let (_, response) = try await URLSession.shared.upload(
+            for: request,
+            from: data
+        )
+        
         guard let response = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
@@ -20,27 +44,53 @@ final class NetworkManager<T: Decodable> {
             throw URLError(.badServerResponse)
         }
         
-        guard let succesData = try? JSONDecoder().decode(T.self, from: data) else { throw URLError(.cannotDecodeContentData)
-        }
-        
-        return succesData
+        return response
     }
 }
 
-class NetworkManagerForImage {
-    private static let imageLoader = ImageLoaderService(cacheCountLimit: 500)
+actor ImageLoaderService {
 
-    @MainActor
-    func setImage(requestType: APIManager) async throws -> UIImage {
-        let url = OpenLibraryAPIManager.createURL(request: requestType).url!
-        var image = try await Self.imageLoader.loadImage(for: url)
+    private var cache = NSCache<NSURL, UIImage>()
 
-        if !Task.isCancelled {
-            if image.imageIsEmpty() {
-                image = UIImage(systemName: "book.closed")!
-            }
+    init(cacheCountLimit: Int) {
+        cache.countLimit = cacheCountLimit
+    }
+
+    func loadImage(for url: URL) async throws -> UIImage {
+        if let image = lookupCache(for: url) {
+            return image
         }
+
+        let image = try await doLoadImage(for: url)
+
+        updateCache(image: image, and: url)
+
+        return lookupCache(for: url) ?? image
+    }
+
+    private func doLoadImage(for url: URL) async throws -> UIImage {
+        let urlRequest = URLRequest(url: url)
+
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        guard let image = UIImage(data: data) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+
         return image
     }
-}
 
+    private func lookupCache(for url: URL) -> UIImage? {
+        return cache.object(forKey: url as NSURL)
+    }
+
+    private func updateCache(image: UIImage, and url: URL) {
+        if cache.object(forKey: url as NSURL) == nil {
+            cache.setObject(image, forKey: url as NSURL)
+        }
+    }
+}

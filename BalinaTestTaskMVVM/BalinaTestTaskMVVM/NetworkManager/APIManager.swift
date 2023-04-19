@@ -8,18 +8,49 @@
 import Foundation
 
 enum APIManager: RequestConstructor {
+    case getData
+    case getDataPagination(page: String)
+    case postData
     
+    var baseURL: String {
+        return "https://junior.balinasoft.com"
+    }
     
-    var baseURL: String
+    var path: String {
+        switch self {
+            case .getData, .getDataPagination:
+                return "/api/v2/photo/type"
+            case .postData:
+                return "/api/v2/photo"
+        }
+    }
     
-    var path: String
+    var params: [String : String]? {
+        var params = [String: String]()
+        switch self {
+            case .getDataPagination(page: let page):
+                params["page"] = page
+            case .postData, .getData:
+                return nil
+        }
+        return params
+    }
     
-    var params: [String : String]?
+    var method: RequestPathType {
+        return .query
+    }
     
-    var method: RequestType
+    var requestType: RequestType {
+        switch self {
+            case .getDataPagination, .getData:
+                return .get
+            case .postData:
+                return .post
+        }
+    }
     
-    static func createURL(request: OpenLibraryAPIManager) -> URLComponents {
-        var components = URLComponents(string: "\(request.baseURL)\(request.path)\(request.method.requestType)")!
+    static func createURL(request: APIManager) -> URLComponents {
+        var components = URLComponents(string: "\(request.baseURL)\(request.path)\(request.method.requestPathType)")!
         
         guard let  parameters = request.params else {
             print(components.url!)
